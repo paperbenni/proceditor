@@ -6,28 +6,20 @@ from .utils.strips import *
 
 
 def compiletitle(titleclip: bpy.types.TextSequence):
-    titlecontent = titleclip.text[2:]
-    newclip = replacetemplate(titleclip, "h")
-    newclip.text = titlecontent
-
+    titlecontent = titleclip.text
+    newclip = replacetemplate(titleclip, "t")
+    if newclip:
+        newclip.text = titlecontent[2:]
+        newclip["pcontent"] = titlecontent
 
 class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_idname = "proceditor.compile"
     bl_label = "compile text"
-    
-    # titles
 
     def execute(self, context):
-        tpattern = re.compile('^h\..*')
-        sequences = getsequences()
-        titlesequences = []
+        titlesequences = getrawsequences(regex='^t\..*')
         bpy.ops.sequencer.select(deselect_all=True)
-        for i in sequences:
-            if type(i) == bpy.types.TextSequence:
-                if tpattern.match(i.text):
-                    titlesequences.append(i)
+
         for i in titlesequences:
             compiletitle(i)
-            
         return {'FINISHED'}
-
