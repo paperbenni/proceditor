@@ -72,6 +72,7 @@ def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
 
     newclip.channel = clip.channel + 1
     newclip.frame_start = clip.frame_start
+    newclip.frame_final_end = clip.frame_final_end
 
     bpy.ops.sequencer.select(deselect_all=True)
     clip.select = True
@@ -80,3 +81,13 @@ def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
     newclip.select = True
     newclip.channel -= 1
     return newclip
+
+def getkeyframes(clipname):
+    returnlist = []
+    matchpath = 'sequence_editor.sequences_all["' + clipname + '"]'
+    for action in bpy.data.actions:
+        for curve in list(action.fcurves):
+            if curve.data_path.startswith(matchpath):
+                returnlist += list(curve.keyframe_points)
+    return returnlist
+

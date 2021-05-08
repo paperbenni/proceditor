@@ -18,8 +18,12 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
 
     def execute(self, context):
         titlesequences = getrawsequences(regex='^t\..*')
+        colorsequences = getrawsequences(regex='^c\..*')
         bpy.ops.sequencer.select(deselect_all=True)
 
         for i in titlesequences:
             compiletitle(i)
+
+        for i in colorsequences:
+            replacetemplate(i, "c")
         return {'FINISHED'}
