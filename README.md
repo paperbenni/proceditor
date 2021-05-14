@@ -68,6 +68,14 @@ insert image from keyword
   - red square noice modifier
   - adjustkeyframes
 
+- website
+  - syntax:w
+  - give link, get scrolling screenshot
+
+- music
+  - syntax: m
+  - give link, download music with youtube-dl, insert
+
 
 ## mrkp - Non-verbose markup language. Doesn't need autocomplete to be usable
 
@@ -88,3 +96,5 @@ telegram sticker template
 parameter, template etc markup abbreviations
 
 define custom templates in blend file
+
+multithreaded compilation

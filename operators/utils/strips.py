@@ -40,6 +40,7 @@ def adjustkeyframes(clip):
     frames = getkeyframes(clip.name)
     if len(frames) == 0:
         return
+    beginframes = []
     endframes = []
 
     middle = (max(i.co[0] for i in frames) + min(i.co[0] for i in frames)) / 2
@@ -48,12 +49,18 @@ def adjustkeyframes(clip):
         frametime = i.co[0]
         if (frametime > middle):
             endframes.append(i)
+        else:
+            beginframes.append(i)
     if len(endframes) == 0:
         return
     frameoffset = clip.frame_final_end - max(i.co[0] for i in endframes)
+    beginoffset = min(i.co[0] for i in beginframes) - clip.frame_start
 
     for i in endframes:
         i.co[0] += frameoffset
+
+    for i in beginframes:
+        i.co[0] += beginoffset
 
 def getresequences(regex, stype=0):
     retsequences = []

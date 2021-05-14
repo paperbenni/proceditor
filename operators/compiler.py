@@ -4,6 +4,7 @@ import os
 
 from .utils.strips import *
 
+
 def compiletitle(titleclip: bpy.types.TextSequence):
     titlecontent = titleclip.text
     newclip = replacetemplate(titleclip, "t")

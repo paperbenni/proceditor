@@ -10,7 +10,7 @@ bl_info = {
 }
 
 from proceditor.operators.texter import PROCEDITOR_OT_add_text
-from proceditor.operators.tcompiler import PROCEDITOR_OT_compiler
+from proceditor.operators.compiler import PROCEDITOR_OT_compiler
 
 def register():
     classes = (PROCEDITOR_OT_add_text, PROCEDITOR_OT_compiler)
