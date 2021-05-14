@@ -4,7 +4,6 @@ import os
 
 from .utils.strips import *
 
-
 def compiletitle(titleclip: bpy.types.TextSequence):
     titlecontent = titleclip.text
     newclip = replacetemplate(titleclip, "t")
@@ -17,8 +16,13 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_label = "compile text"
 
     def execute(self, context):
+        selectedclips = []
+        for i in bpy.context.scene.sequence_editor.sequences_all:
+            if i.select:
+                selectedclips.append(i)
         titlesequences = getrawsequences(regex='^t\..*')
         colorsequences = getrawsequences(regex='^c\..*')
+        compiledsequences = getrawsequences(compiled = True)
         bpy.ops.sequencer.select(deselect_all=True)
 
         for i in titlesequences:
@@ -26,4 +30,10 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
 
         for i in colorsequences:
             replacetemplate(i, "c")
+
+        for i in compiledsequences:
+            adjustkeyframes(i)
+        
+        for i in selectedclips:
+            i.select = True
         return {'FINISHED'}

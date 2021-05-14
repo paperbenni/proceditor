@@ -11,16 +11,16 @@ def getnewsequence(previoussequences):
     return list(set(getsequences()) - set(previoussequences))[0]
 
 # get sequences witout the compiler marker _c$, optionally filter through regex
-
-
-def getrawsequences(regex=''):
+def getrawsequences(regex='', compiled=False):
     allsequences = bpy.context.scene.sequence_editor.sequences_all
     returnlist = []
     tpattern = re.compile('.*(_c|_c\.[0-9]*)$')
     if not regex == '':
         fpattern = re.compile(regex)
     for i in allsequences:
-        if type(i) == bpy.types.TextSequence and not tpattern.match(i.name):
+        if type(i) == bpy.types.TextSequence and \
+                (not compiled and not tpattern.match(i.name) or (compiled and tpattern.match(i.name))):
+            # with custom search string
             if not regex == '':
                 if not fpattern.match(i.text):
                     continue
@@ -35,6 +35,26 @@ def gettemplate(tname):
             return i
 
 
+# move keyframes at the end of the clip towards the end
+def adjustkeyframes(clip):
+    frames = getkeyframes(clip.name)
+    if len(frames) == 0:
+        return
+    endframes = []
+
+    middle = (max(i.co[0] for i in frames) + min(i.co[0] for i in frames)) / 2
+
+    for i in frames:
+        frametime = i.co[0]
+        if (frametime > middle):
+            endframes.append(i)
+    if len(endframes) == 0:
+        return
+    frameoffset = clip.frame_final_end - max(i.co[0] for i in endframes)
+
+    for i in endframes:
+        i.co[0] += frameoffset
+
 def getresequences(regex, stype=0):
     retsequences = []
     pattern = re.compile(regex)
@@ -45,6 +65,7 @@ def getresequences(regex, stype=0):
             elif type(i) == stype:
                 retsequences.append(i)
     return retsequences
+
 
 def activateselection():
     for i in getsequences():
@@ -80,7 +101,9 @@ def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
     newclip.name = clipname
     newclip.select = True
     newclip.channel -= 1
+    adjustkeyframes(newclip)
     return newclip
+
 
 def getkeyframes(clipname):
     returnlist = []
@@ -90,4 +113,3 @@ def getkeyframes(clipname):
             if curve.data_path.startswith(matchpath):
                 returnlist += list(curve.keyframe_points)
     return returnlist
-
