@@ -7,9 +7,11 @@ from .utils.strips import *
 def compiletitle(titleclip: bpy.types.TextSequence):
     titlecontent = titleclip.text
     newclip = replacetemplate(titleclip, "t")
-    if newclip:
-        newclip.text = titlecontent[2:]
-        newclip["pcontent"] = titlecontent
+    if not newclip:
+        return
+
+    newclip.text = titlecontent[2:]
+    newclip["pcontent"] = titlecontent
 
 class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_idname = "proceditor.compile"

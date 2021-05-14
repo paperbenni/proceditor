@@ -12,6 +12,10 @@ offset markup clips when stacked
 
 metaclip support for modifying templates
 
+ability to freeze compiled clip for manual editing
+
+adjustkeyframes beginning keyframes
+
 ### clip naming scheme
 
 template:keyword
@@ -30,7 +34,7 @@ insert image from keyword
 ### templates
 
 - color
-  - syntax: c 
+  - syntax: c
   - parameter 1 is color
   - can be hex code or selection from colorscheme
 
@@ -64,6 +68,10 @@ insert image from keyword
   - red square noice modifier
   - adjustkeyframes
 
+
+## mrkp - Non-verbose markup language. Doesn't need autocomplete to be usable
+
+options without separator;semicolon.objecttype:content1::content2::content3
 
 ## TODO for the far future
 
