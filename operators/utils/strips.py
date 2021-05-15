@@ -6,6 +6,17 @@ import os
 def getsequences():
     return list(bpy.context.scene.sequence_editor.sequences_all)
 
+def saveselection():
+    returnlist = []
+    for i in getsequences():
+        if i.select:
+            returnlist.append(i)
+    return returnlist
+
+def restoreselection(selectlist):
+    bpy.ops.sequencer.select(deselect_all=True)
+    for i in selectlist:
+        i.select = True
 
 def getnewsequence(previoussequences):
     return list(set(getsequences()) - set(previoussequences))[0]
@@ -83,9 +94,10 @@ def activateselection():
 
 def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
     sequences = getrawsequences()
+    markupcontent = clip.text
     templateclip = gettemplate(templatename)
     if not templateclip:
-        return NULL
+        return False
 
     clipname = clip.name + '_c'
 
@@ -108,6 +120,7 @@ def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
     newclip.name = clipname
     newclip.select = True
     newclip.channel -= 1
+    newclip["pcontent"] = markupcontent
     adjustkeyframes(newclip)
     return newclip
 

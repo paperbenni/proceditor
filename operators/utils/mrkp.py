@@ -2,7 +2,7 @@ import re
 from enum import Enum
 
 Prefix = Enum(
-    'Prefix', 'TITLE REDDIT QUOTE COLOR STINGER IDLE ANGRY TWITTER PARAGRAPH')
+    'Prefix', 'TITLE REDDIT QUOTE COLOR STINGER IDLE ANGRY TWITTER PARAGRAPH AUDIO')
 
 prefixes = {("title", "t"): Prefix.TITLE,
             ("reddit", "r"): Prefix.REDDIT,
@@ -10,8 +10,9 @@ prefixes = {("title", "t"): Prefix.TITLE,
             ("quote", "q"): Prefix.QUOTE,
             ("stinger", "s"): Prefix.STINGER,
             ("idle", "i"): Prefix.IDLE,
-            ("angry", "a"): Prefix.ANGRY,
+            ("angry", "ia"): Prefix.ANGRY,
             ("paragraph", "p"): Prefix.PARAGRAPH,
+            ("audio", "a"): Prefix.AUDIO,
             ("twitter", "t"): Prefix.TWITTER}
 
 
@@ -44,10 +45,5 @@ class mrkpquery():
             return [self.query]
         paramquery = re.sub('^[^.]*\.', '', self.query)
         returnlist = []
-        if ':' in paramquery:
-            if re.compile('^[^:]*:[^:]').match(paramquery):
-                tmpreturn = re.compile('^[^:]*:').findall(paramquery)[0]
-                returnlist.append(tmpreturn[:len(tmpreturn) - 1])
-                paramquery = re.sub('^[^:]*:', '', paramquery)
         returnlist.extend(paramquery.split("::"))
         return returnlist

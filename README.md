@@ -4,6 +4,15 @@ procedual video editing for blender. first time addon developer, expect shitty c
 
 What follows is a bunch of rambling about how the addon could work
 
+
+## Dependencies
+
+youtube_dl
+ddgimcli
+ffmpeg
+
+**only runs on unix like systems**
+
 ## TODO
 
 alert when template is not found
