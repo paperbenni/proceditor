@@ -114,9 +114,7 @@ def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
     newclip.frame_start = clip.frame_start
     newclip.frame_final_end = clip.frame_final_end
 
-    bpy.ops.sequencer.select(deselect_all=True)
-    clip.select = True
-    bpy.ops.sequencer.delete()
+    bpy.context.scene.sequence_editor.sequences.remove(clip)
     newclip.name = clipname
     newclip.select = True
     newclip.channel -= 1

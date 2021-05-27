@@ -55,9 +55,7 @@ def compileaudio(clip: bpy.types.TextSequence):
     startframe = clip.frame_start
     endframe = clip.frame_final_end
     channel = clip.channel
-    bpy.ops.sequencer.select(deselect_all=True)
-    clip.select = True
-    bpy.ops.sequencer.delete()
+    bpy.context.scene.sequence_editor.sequences.remove(clip)
     os.system('notify-send "' + filepath + '"')
     bpy.context.scene.sequence_editor.sequences.new_sound("proceditor audio", filepath, channel, startframe)
 

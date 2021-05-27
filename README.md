@@ -7,11 +7,14 @@ What follows is a bunch of rambling about how the addon could work
 
 ## Dependencies
 
+**only runs on unix like systems**
+
 youtube_dl
 ddgimcli
 ffmpeg
+npm
+xclip
 
-**only runs on unix like systems**
 
 ## TODO
 
@@ -84,6 +87,9 @@ insert image from keyword
 - music
   - syntax: m
   - give link, download music with youtube-dl, insert
+
+- youtube video
+  - give in/out parameter to download specific portion of video
 
 
 ## mrkp - Non-verbose markup language. Doesn't need autocomplete to be usable
