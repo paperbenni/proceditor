@@ -17,7 +17,6 @@ class PROCEDITOR_OT_add_text(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
-        sequences = getsequences()
         newclip = bpy.context.scene.sequence_editor.sequences.new_effect(
             name="mrkp", type='TEXT',
             frame_start=bpy.context.scene.frame_current,

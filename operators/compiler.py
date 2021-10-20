@@ -12,8 +12,9 @@ def compilemarkupclip(clip: bpy.types.TextSequence):
     if not query.valid:
         return False
 
-    newtemplate = replacetemplate(clip, query.name);
-    if newtemplate == None:
+    newtemplate = replacemarkupclip(clip, query.name);
+
+    if not newtemplate:
         return False
     
     compiletemplate(newtemplate)
@@ -100,10 +101,11 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
         rawsequences = getmarkupsequences()
 
         for i in rawsequences:
-            compilemarkupclip(i)
+            if i.text[0] == ';':
+                compilemarkupclip(i)
 
-        bpy.ops.sequencer.select(deselect_all=True)
+        # bpy.ops.sequencer.select(deselect_all=True)
 
-        for i in selectedclips:
-            i.select = True
+        # for i in selectedclips:
+        #     i.select = True
         return {'FINISHED'}

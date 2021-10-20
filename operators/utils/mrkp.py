@@ -15,7 +15,7 @@ class mrkpquery():
             self.query = query
 
         self.name = query.split(';')[1]
-        if gettemplate(self.name) is None:
+        if not gettemplate(self.name):
             self.valid = False
             return
         self.arguments = query.split(';')[2:]
