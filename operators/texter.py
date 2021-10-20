@@ -4,11 +4,13 @@ import os
 from .utils.strips import *
 
 # quick way to add markup clips
+
+
 class PROCEDITOR_OT_add_text(bpy.types.Operator):
     bl_idname = "proceditor.add_text"
     bl_label = "Add a text clip with a text popup"
 
-    text_content: bpy.props.StringProperty(name="text")
+    text_content: bpy.props.StringProperty(name="mrkp")
 
     def invoke(self, context, event):
         wm = context.window_manager
@@ -16,7 +18,8 @@ class PROCEDITOR_OT_add_text(bpy.types.Operator):
 
     def execute(self, context):
         sequences = getsequences()
-        bpy.ops.sequencer.effect_strip_add(type='TEXT', frame_start = bpy.context.scene.frame_current, frame_end = bpy.context.scene.frame_current + 20)
+        newclip = bpy.context.scene.sequence_editor.sequences.new_effect(
+            name="mrkp", type='TEXT', frame_start=bpy.context.scene.frame_current, frame_end=bpy.context.scene.frame_current + 20, channel=3)
         activateselection()
         newclip = bpy.context.scene.sequence_editor.active_strip
         newclip.text = self.text_content

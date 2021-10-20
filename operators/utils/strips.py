@@ -81,6 +81,7 @@ def replacetemplate(clip: bpy.types.TextSequence, templatename: str):
 
     bpy.ops.sequencer.select(deselect_all=True)
     templateclip.select = True
+    # maybe replace ops with api
     bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={},
                                      TRANSFORM_OT_seq_slide={"value": (0, 1), "snap": False, "snap_target": 'CLOSEST', "snap_point": (
                                          0, 0, 0), "snap_align": False, "snap_normal": (0, 0, 0), "release_confirm": False, "use_accurate": False})

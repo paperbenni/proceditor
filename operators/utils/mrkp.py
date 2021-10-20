@@ -1,7 +1,7 @@
 import re
 from enum import Enum
 
-from operators.utils.strips import gettemplate
+from .strips import gettemplate
 
 # various markp utilities
 

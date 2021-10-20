@@ -29,4 +29,5 @@ def addmusic(link):
     filename = downloadclip(link)
     if not filename:
         return False
+    # replace with api
     bpy.ops.sequencer.sound_strip_add(filepath=filename, frame_start = bpy.context.frame_current)

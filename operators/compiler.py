@@ -28,7 +28,7 @@ def compiletemplate(clip: bpy.types.MetaSequence):
     if not query.valid:
         return False
 
-    for i in placeholders():
+    for i in placeholders:
         compileplaceholder(i, query.arguments[placeholders.index(i)])
     
     adjustkeyframes(clip)
