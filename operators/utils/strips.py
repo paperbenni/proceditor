@@ -146,3 +146,11 @@ def adjustkeyframes(clip):
 
     for i in beginframes:
         i.co[0] += beginoffset
+
+def gettopchannel(frame):
+    channel = 0
+    for i in getsequences():
+        if i.frame_final_start <= frame and i.frame_final_end >= frame:
+            if i.channel > channel:
+                channel = i.channel
+    return channel + 1
