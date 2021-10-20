@@ -5,7 +5,7 @@ addon_keymaps = []
 
 bl_info = {
     "name": "proceditor",
-    "blender": (2, 92, 0),
+    "blender": (2, 93, 0),
     "category": "Sequencer"
 }
 
@@ -20,6 +20,7 @@ def register():
     # Note that in background mode (no GUI available), keyconfigs are not available either,
     # so we have to check this to avoid nasty errors in background case.
     kc = wm.keyconfigs.addon
+
     if kc:
         km = wm.keyconfigs.addon.keymaps.new(name='SequencerCommon', space_type='SEQUENCE_EDITOR')
 

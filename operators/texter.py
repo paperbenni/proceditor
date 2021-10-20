@@ -3,6 +3,7 @@ import os
 
 from .utils.strips import *
 
+# quick way to add markup clips
 class PROCEDITOR_OT_add_text(bpy.types.Operator):
     bl_idname = "proceditor.add_text"
     bl_label = "Add a text clip with a text popup"

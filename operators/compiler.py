@@ -6,91 +6,104 @@ from .utils.strips import *
 from .utils.mrkp import *
 from .utils.audio import *
 
-colorscheme = {
-    ("r", "red") : "#E0527E", 
-    ("dr", "red") : "#E0527E", 
-    ("g", "green") : "#52DF67", 
-    ("b", "blue") : "#5293E1",
-    ("bg", "background"): "#292F3A", 
-    ("y", "yellow"): "#E09F52"
-}
 
-def compiletitle(titleclip: bpy.types.TextSequence):
-    titlecontent = titleclip.text
-    newclip = replacetemplate(titleclip, "t")
-    if not newclip:
-        return
-
-    newclip.text = mrkpquery(titlecontent).getparams()[0]
-    newclip["pcontent"] = titlecontent
-
-def compilecolor(clip: bpy.types.TextSequence):
-
-    params = mrkpquery(clip.text).getparams()
-    newclip = replacetemplate(clip, "c")
-    if not newclip:
+def compilemarkupclip(clip: bpy.types.TextSequence):
+    query = mrkpquery(clip.text)
+    if not query.valid:
         return False
-    # allow custom color
-    if len(params) != 0:
-        customcolor = False
-        if re.compile('^#[0-f][0-f][0-f][0-f][0-f][0-f]').match(params[0]):
-            customcolor = params[0].lstrip("#")
-        else:
-            for i in colorscheme.keys():
-                param = params[0]
-                if param in i:
-                    customcolor = colorscheme[i].lower().lstrip("#")
 
-        if customcolor:
-            colortuple = tuple(int(customcolor[i:i+2], 16) for i in (0, 2, 4))
-            newclip.color.r = float(colortuple[0]) / 255
-            newclip.color.g = float(colortuple[1]) / 255
-            newclip.color.b = float(colortuple[2]) / 255
-
-def compileaudio(clip: bpy.types.TextSequence):
-    params = mrkpquery(clip.text).getparams()
-    filepath = downloadclip(params[0])
-    if not filepath:
+    newtemplate = replacetemplate(clip, query.name);
+    if newtemplate == None:
         return False
-    startframe = clip.frame_start
-    endframe = clip.frame_final_end
-    channel = clip.channel
-    bpy.context.scene.sequence_editor.sequences.remove(clip)
-    os.system('notify-send "' + filepath + '"')
-    bpy.context.scene.sequence_editor.sequences.new_sound("proceditor audio", filepath, channel, startframe)
+    
+    compiletemplate(newtemplate)
+
+def compiletemplate(clip: bpy.types.MetaSequence):
+
+    if clip["pcontent"] == None:
+        return False
+    placeholders = get_placeholders(clip)
+
+    query = mrkpquery(clip["pcontent"])
+    if not query.valid:
+        return False
+
+    for i in placeholders():
+        compileplaceholder(i, query.arguments[placeholders.index(i)])
+    
+    adjustkeyframes(clip)
+    return True
 
 
-compilers = {
-    Prefix.TITLE: compiletitle,
-    Prefix.COLOR: compilecolor, 
-    Prefix.AUDIO: compileaudio
-}
+def compileplaceholder(clip: bpy.types.Sequence, param):
+    cliptype = type(clip)
+    # param as content for text clip
+    if cliptype == bpy.types.TextSequence:
+        clip.text = param
+    # multiple choice metaclips, delete all except with name choice.param
+    elif cliptype == bpy.types.MetaSequence:
+        choices = clip.sequences.values()
+        for i in choices:
+            if i.name.startswith('choice.'):
+                if i.name.removeprefix('choice.') != param:
+                    removeclip(i)
+
+
+def get_placeholders(clip: bpy.types.MetaSequence):
+    placeholders = []
+    placeholderregex = re.compile('^:[0-9][0-9]*:')
+    counter = 0
+
+    for i in clip.sequences.values():
+        if placeholderregex.match(i.name):
+            if int(i.name[1]) <= counter:
+                placeholders.append(i)
+                counter += 1
+    return placeholders
+
+
+def rgbtocolor(rgbcode):
+    if not re.compile('^#[0-f][0-f][0-f][0-f][0-f][0-f]').match(rgbcode):
+        return None
+
+    colorcode = rgbcode.removeprefix('#').lower()
+    colortuple = tuple(int(colorcode[i:i+2], 16) for i in (0, 2, 4))
+    retcolor = Color((
+        float(colortuple[0]) / 255,
+        float(colortuple[1]) / 255,
+        float(colortuple[2]) / 255
+    ))
+    return retcolor
+
+
+# def compileaudio(clip: bpy.types.TextSequence):
+#     params = mrkpquery(clip.text).getparams()
+#     filepath = downloadclip(params[0])
+#     if not filepath:
+#         return False
+#     startframe = clip.frame_start
+#     endframe = clip.frame_final_end
+#     channel = clip.channel
+#     bpy.context.scene.sequence_editor.sequences.remove(clip)
+#     os.system('notify-send "' + filepath + '"')
+#     bpy.context.scene.sequence_editor.sequences.new_sound(
+#         "proceditor audio", filepath, channel, startframe)
+
 
 class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_idname = "proceditor.compile"
     bl_label = "compile text"
 
     def execute(self, context):
-        selectedclips = []
-        for i in bpy.context.scene.sequence_editor.sequences_all:
-            if i.select:
-                selectedclips.append(i)
+        selectedclips = saveselection()
 
-        rawsequences = getrawsequences()
+        rawsequences = getmarkupsequences()
 
         for i in rawsequences:
-            query = mrkpquery(i.text)
-            type = query.gettype()
-            if type and type in compilers.keys():
-                compilers[type](i)
+            compilemarkupclip(i)
 
         bpy.ops.sequencer.select(deselect_all=True)
 
-        compiledsequences = getrawsequences(compiled = True)
-
-        for i in compiledsequences:
-            adjustkeyframes(i)
-        
         for i in selectedclips:
             i.select = True
         return {'FINISHED'}

@@ -1,49 +1,22 @@
 import re
 from enum import Enum
 
-Prefix = Enum(
-    'Prefix', 'TITLE REDDIT QUOTE COLOR STINGER IDLE ANGRY TWITTER PARAGRAPH AUDIO')
+from operators.utils.strips import gettemplate
 
-prefixes = {("title", "t"): Prefix.TITLE,
-            ("reddit", "r"): Prefix.REDDIT,
-            ("color", "c"): Prefix.COLOR,
-            ("quote", "q"): Prefix.QUOTE,
-            ("stinger", "s"): Prefix.STINGER,
-            ("idle", "i"): Prefix.IDLE,
-            ("angry", "ia"): Prefix.ANGRY,
-            ("paragraph", "p"): Prefix.PARAGRAPH,
-            ("audio", "a"): Prefix.AUDIO,
-            ("twitter", "t"): Prefix.TWITTER}
+# various markp utilities
 
-
+# provide api to parse markup string
 class mrkpquery():
     def __init__(self, query):
-        self.query = query
-
-    def getoptions(self):
-        if self.query[0] == ';':
-            return False
-        if ';' in self.query:
-            optionstring = re.compile("^[^;]*;").findall(self.query)[0]
-            if not optionstring:
-                return False
-            return list(optionstring)[:-1]
-
-    def gettype(self):
-        if ';' in self.query:
-            typequery = re.sub('^[^;]*;', '', self.query)
+        if not query[0] == ';':
+            self.valid = False
         else:
-            typequery = self.query
-        typequery = re.sub('\..*$', '', typequery)
-        for i in prefixes.keys():
-            if typequery in i:
-                return prefixes[i]
-        return False
+            self.valid = True
+            self.query = query
 
-    def getparams(self):
-        if not '.' in self.query:
-            return [self.query]
-        paramquery = re.sub('^[^.]*\.', '', self.query)
-        returnlist = []
-        returnlist.extend(paramquery.split("::"))
-        return returnlist
+        self.name = query.split(';')[1]
+        if gettemplate(self.name) is None:
+            self.valid = False
+            return
+        self.arguments = query.split(';')[2:]
+

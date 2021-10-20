@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "installing proceditor"
+
 for i in ~/.config/blender/*; do
 
     [ -d "$i" ] || continue
