@@ -166,7 +166,7 @@ def adjustkeyframes(clip, oldduration):
 
     for i in frames:
         frametime = i.co[0]
-        if (frametime > oldduration / 2):
+        if (frametime > (clip.frame_final_start + oldduration / 2)):
             endframes.append(i)
         else:
             beginframes.append(i)
@@ -174,7 +174,7 @@ def adjustkeyframes(clip, oldduration):
     if len(endframes) == 0:
         return
 
-    endoffset = oldduration - clip.frame_final_duration
+    endoffset = clip.frame_final_duration - oldduration
     for i in endframes:
         i.co[0] += endoffset
 
