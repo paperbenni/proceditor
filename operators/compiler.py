@@ -33,7 +33,12 @@ def compiletemplate(clip: bpy.types.MetaSequence):
     for i in placeholders:
         compileplaceholder(i, query.arguments[getplaceholderindex(i)])
 
+    templatelength = clip.frame_final_duration
     adjustlength(clip, clip["templatelength"])
+
+    # I have no idea why this awful hack is needed, but it is
+    bpy.ops.transform.seq_slide(value=(0, 0))
+    clip.frame_final_duration = templatelength
 
     return True
 
@@ -46,14 +51,13 @@ def getplaceholderindex(placeholder):
 def adjustlength(clip, oldlength):
     clips = clip.sequences.values()
     for i in clips:
-        if i.frame_start == clip.frame_start:
+        if i.frame_final_start == clip.frame_final_start:
             # clip fills entire template
             if i.frame_final_duration == oldlength:
                 i.frame_final_duration = clip.frame_final_duration
                 adjustkeyframes(i, oldlength)
-        elif i.frame_final_start > clip.frame_start + oldlength / 2:
-            offset = clip.frame_final_start + oldlength - i.frame_final_end
-            i.frame_start = clip.frame_final_end - i.frame_final_duration - offset
+        elif i.frame_final_start > clip.frame_final_start + (oldlength / 2):
+            i.frame_start += clip.frame_final_duration - oldlength
 
 
 def compileplaceholder(clip: bpy.types.Sequence, param):
@@ -95,20 +99,6 @@ def rgbtocolor(rgbcode):
         float(colortuple[2]) / 255
     ))
     return retcolor
-
-
-# def compileaudio(clip: bpy.types.TextSequence):
-#     params = mrkpquery(clip.text).getparams()
-#     filepath = downloadclip(params[0])
-#     if not filepath:
-#         return False
-#     startframe = clip.frame_start
-#     endframe = clip.frame_final_end
-#     channel = clip.channel
-#     bpy.context.scene.sequence_editor.sequences.remove(clip)
-#     os.system('notify-send "' + filepath + '"')
-#     bpy.context.scene.sequence_editor.sequences.new_sound(
-#         "proceditor audio", filepath, channel, startframe)
 
 
 class PROCEDITOR_OT_compiler(bpy.types.Operator):

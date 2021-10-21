@@ -103,8 +103,8 @@ def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
         return False
 
     markupcontent = clip.text
-    startframe = clip.frame_start
-    endframe = clip.frame_final_end
+    startframe = clip.frame_final_start
+    markupduration = clip.frame_final_duration
     markupchannel = clip.channel
     clipname = clip.name
 
@@ -122,14 +122,14 @@ def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
 
     # maybe replace ops with api
     bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={},
-                                     TRANSFORM_OT_seq_slide={"value": (startframe - templateclip.frame_start,
+                                     TRANSFORM_OT_seq_slide={"value": (startframe - templateclip.frame_final_start,
                                                                        markupchannel - templateclip.channel), "snap": False, "snap_target":
                                                              'CLOSEST', "snap_point": (0, 0, 0), "snap_align": False, "snap_normal": (0,
                                                                                                                                       0, 0), "release_confirm": False, "use_accurate": False})
 
     newclip = list(filter(lambda element: element.select, list(
         bpy.context.scene.sequence_editor.sequences)))[0]
-    newclip.frame_final_end = endframe
+    newclip.frame_final_duration = markupduration
     newclip.name = clipname + '_c'
     newclip["pcontent"] = markupcontent
     newclip["templatelength"] = templatelength
