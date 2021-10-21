@@ -111,7 +111,8 @@ def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
     removeclip(clip)
 
     templateclip = gettemplate(templatename)
-    os.system('notify-send "' + templateclip.name + '"')
+    templatelength = templateclip.frame_final_duration
+
     if not templateclip:
         return False
 
@@ -121,18 +122,17 @@ def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
 
     # maybe replace ops with api
     bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={},
-                                     TRANSFORM_OT_seq_slide={"value": (startframe - templateclip.frame_start, markupchannel - templateclip.channel), "snap": False,
-                                                             "snap_target": 'CLOSEST', "snap_point": (0, 0, 0), "snap_align": False,
-                                                             "snap_normal": (0, 0, 0), "release_confirm": False, "use_accurate": False})
-
+                                     TRANSFORM_OT_seq_slide={"value": (startframe - templateclip.frame_start,
+                                                                       markupchannel - templateclip.channel), "snap": False, "snap_target":
+                                                             'CLOSEST', "snap_point": (0, 0, 0), "snap_align": False, "snap_normal": (0,
+                                                                                                                                      0, 0), "release_confirm": False, "use_accurate": False})
 
     newclip = list(filter(lambda element: element.select, list(
         bpy.context.scene.sequence_editor.sequences)))[0]
     newclip.frame_final_end = endframe
     newclip.name = clipname + '_c'
     newclip["pcontent"] = markupcontent
-
-    adjustkeyframes(newclip)
+    newclip["templatelength"] = templatelength
 
     return newclip
 
@@ -155,31 +155,28 @@ def removeclip(clip):
 # move keyframes at the end of the clip towards the end
 
 
-def adjustkeyframes(clip):
+def adjustkeyframes(clip, oldduration):
     frames = getkeyframes(clip.name)
+
     if len(frames) == 0:
         return
+
     beginframes = []
     endframes = []
 
-    middle = (max(i.co[0] for i in frames) + min(i.co[0] for i in frames)) / 2
-
     for i in frames:
         frametime = i.co[0]
-        if (frametime > middle):
+        if (frametime > oldduration / 2):
             endframes.append(i)
         else:
             beginframes.append(i)
+
     if len(endframes) == 0:
         return
-    frameoffset = clip.frame_final_end - max(i.co[0] for i in endframes)
-    beginoffset = min(i.co[0] for i in beginframes) - clip.frame_start
 
+    endoffset = oldduration - clip.frame_final_duration
     for i in endframes:
-        i.co[0] += frameoffset
-
-    for i in beginframes:
-        i.co[0] += beginoffset
+        i.co[0] += endoffset
 
 
 def gettopchannel(frame):

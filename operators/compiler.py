@@ -31,10 +31,24 @@ def compiletemplate(clip: bpy.types.MetaSequence):
 
     for i in placeholders:
         compileplaceholder(i, query.arguments[placeholders.index(i)])
-    
-    adjustkeyframes(clip)
+
+    adjustlength(clip, clip["templatelength"])
+
     return True
 
+def adjustlength(clip, oldlength):
+    clips = clip.sequences.values()
+    for i in clips:
+        if i.frame_start == clip.frame_start:
+            # clip fills entire template
+            if i.frame_final_duration == oldlength:
+                i.frame_final_duration = clip.frame_final_duration
+                adjustkeyframes(i, oldlength)
+
+        if i.frame_final_start > clip.frame_start + oldlength / 2:
+                offset = clip.frame_final_start + oldlength - i.frame_final_end
+                i.frame_start = clip.frame_final_end - i.frame_final_duration - offset
+                
 
 def compileplaceholder(clip: bpy.types.Sequence, param):
     cliptype = type(clip)
