@@ -46,10 +46,20 @@ template_text
 ## Placeholders
 
 Placeholders are clips inside templates that have their contents replaced by the
-template parameters. Their naming scheme is `:parameter_index:`. The most
+template parameters. Their naming scheme is `:parameter_index:options`. The most
 simple example is a text clip with the name `:0:` (Parameters start at 0). This
 text clip will take the first parameter passed to the template as the text
 content. 
+
+### Text placeholders
+
+These take a single tring as their argument and will replace their content with that string
+
+### Empty metaclip placeholders
+
+Upon compilation these will pull any clips close to the markup clip inside
+them, allowing for things like splitscreen, or reusing movement animations for
+arbitrary clips
 
 ## Markup Clips
 

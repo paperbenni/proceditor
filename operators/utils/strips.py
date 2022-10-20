@@ -1,11 +1,23 @@
-import bpy
-import re
 import os
+import re
+
+import bpy
 
 
 def getsequences():
     return list(bpy.context.scene.sequence_editor.sequences_all)
 
+def getnearbysequences(clip, range):
+    returnlist = []
+    clipparent = clip.parent_meta()
+    for i in getsequences():
+        if i.parent_meta() != clipparent:
+            continue
+        if i.channel >= (clip.channel - range) and i.channel < clip.channel and i.frame_start >= clip.frame_start and i.frame_final_end <= clip.frame_final_end:
+            returnlist.append(i)
+            if len(returnlist) >= range:
+                break
+    return returnlist
 
 # TODO comment difference between this and getsequences
 def gettopsequences():
