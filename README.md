@@ -30,36 +30,45 @@ ability to freeze compiled clip for manual editing
 
 adjustkeyframes beginning keyframes
 
-### clip naming scheme
 
-### Templates
+## Templates
 
-template_keyword
+Templates are metaclips which take parameters that alter their contents. 
+To create a template, create a metaclip (ctrl + g with a strip selected) and name it
+`template_keyword`
 
-template is a metaclip
+example
 
-parameter:keyword:number clips get altered by markup
+```
+template_text
+```
 
-options;yourclipname gets modifiers applied to it
-for instance, adjustkeyframes for clips that aren't parameters
+## Placeholders
 
-parameter:keyword:number
+Placeholders are clips inside templates that have their contents replaced by the
+template parameters. Their naming scheme is `:parameter_index:`. The most
+simple example is a text clip with the name `:0:` (Parameters start at 0). This
+text clip will take the first parameter passed to the template as the text
+content. 
 
+## Markup Clips
 
-insert image from keyword
+Markup clips are text clips which have contents matching a simple markup
+language. The markup contains a template name along with some parameters.
+Proceditor can replace these with a copy of the specified template and apply
+the parameters from the text to the template. 
 
-### Using templates
+The syntax for markup clips is
+```
+;templatename;parameter1;parameter2
+```
+Example
+```
+;title;This is the content of a title
+```
 
-templatename;parameter1;parameter2
+### template ideas
 
-
-
-### templates
-
-- color
-  - syntax: c
-  - parameter 1 is color
-  - can be hex code or selection from colorscheme
 
 - twitter
   - syntax: tw
@@ -102,6 +111,12 @@ templatename;parameter1;parameter2
 - youtube video
   - give in/out parameter to download specific portion of video
 
+## Placeholder ideas
+
+- color clip
+  - parameter is color
+  - can be hex code or selection from colorscheme
+
 
 ## mrkp - Non-verbose markup language. Doesn't need autocomplete to be usable
 
@@ -124,3 +139,16 @@ parameter, template etc markup abbreviations
 define custom templates in blend file
 
 multithreaded compilation
+
+## old documentation stuff, please rework
+
+parameter:keyword:number clips get altered by markup
+
+options;yourclipname gets modifiers applied to it
+for instance, adjustkeyframes for clips that aren't parameters
+
+parameter:keyword:number
+
+
+insert image from keyword
+

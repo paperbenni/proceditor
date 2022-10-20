@@ -76,7 +76,8 @@ def compileplaceholder(clip: bpy.types.Sequence, param):
             if i.name.startswith('choice.'):
                 if i.name.removeprefix('choice.') != param:
                     removeclip(i)
-
+    # TODO: give index to choice
+    # TODO: compile color clips with hex color code parameter
 
 # get list of all clips inside metaclip that are to be replaced by parameters
 def get_placeholders(clip: bpy.types.MetaSequence):
