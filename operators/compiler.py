@@ -31,7 +31,10 @@ def compiletemplate(clip: bpy.types.MetaSequence):
         return False
 
     for i in placeholders:
-        compileplaceholder(i, query.arguments[getplaceholderindex(i)])
+        holderindex = getplaceholderindex(i)
+        if len(query.arguments) <= holderindex:
+            break
+        compileplaceholder(i, query.arguments[holderindex])
 
     templatelength = clip.frame_final_duration
     adjustlength(clip, clip["templatelength"])

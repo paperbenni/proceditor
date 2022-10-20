@@ -37,6 +37,7 @@ adjustkeyframes beginning keyframes
 template_keyword
 
 template is a metaclip
+
 parameter:keyword:number clips get altered by markup
 
 options;yourclipname gets modifiers applied to it
