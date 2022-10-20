@@ -7,10 +7,13 @@ def getsequences():
     return list(bpy.context.scene.sequence_editor.sequences_all)
 
 
+# TODO comment difference between this and getsequences
 def gettopsequences():
     return list(bpy.context.scene.sequence_editor.sequences)
 
-
+# some things don't have a good API so proceditor needs to emulate a user by
+# selecting and doing stuff with the clips
+# This is needed to restore the selection afterwards
 def saveselection():
     returnlist = []
     for i in getsequences():
@@ -18,13 +21,12 @@ def saveselection():
             returnlist.append(i)
     return returnlist
 
-
+# restore clip selection after emulating a user due to lack of good API
 def restoreselection(selectlist):
     bpy.ops.sequencer.select(deselect_all=True)
     for i in selectlist:
         i.select = True
 
-# return newly added sequence
 
 
 def savesequences():
@@ -34,6 +36,7 @@ def savesequences():
     return returnlist
 
 
+# return newly added sequences
 def getnewsequences(sequencelist):
     returnlist = []
     for i in sequencelist:
@@ -42,8 +45,6 @@ def getnewsequences(sequencelist):
     return returnlist
 
 # get sequences witout the compiler marker _c$, optionally filter through regex
-
-
 def getmarkupsequences(regex='', compiled=False):
     sequences = bpy.context.scene.sequence_editor.sequences
     returnlist = []
@@ -123,9 +124,7 @@ def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
     # maybe replace ops with api
     bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={},
                                      TRANSFORM_OT_seq_slide={"value": (startframe - templateclip.frame_final_start,
-                                                                       markupchannel - templateclip.channel), "snap": False, "snap_target":
-                                                             'CLOSEST', "snap_point": (0, 0, 0), "snap_align": False, "snap_normal": (0,
-                                                                                                                                      0, 0), "release_confirm": False, "use_accurate": False})
+                                                                       markupchannel - templateclip.channel), "release_confirm": False, "use_accurate": False})
 
     newclip = list(filter(lambda element: element.select, list(
         bpy.context.scene.sequence_editor.sequences)))[0]

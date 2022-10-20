@@ -1,5 +1,7 @@
 # proceditor
-procedual video editing for blender. first time addon developer, expect shitty code
+
+procedual video editing for blender. first time addon developer, expect shitty
+code
 
 
 What follows is a bunch of rambling about how the addon could work
@@ -30,7 +32,9 @@ adjustkeyframes beginning keyframes
 
 ### clip naming scheme
 
-template:keyword
+### Templates
+
+template_keyword
 
 template is a metaclip
 parameter:keyword:number clips get altered by markup
@@ -42,6 +46,12 @@ parameter:keyword:number
 
 
 insert image from keyword
+
+### Using templates
+
+templatename;parameter1;parameter2
+
+
 
 ### templates
 

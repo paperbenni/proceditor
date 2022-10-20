@@ -43,6 +43,7 @@ def compiletemplate(clip: bpy.types.MetaSequence):
     return True
 
 
+# get parameter index for placeholder
 def getplaceholderindex(placeholder):
     indexregex = re.compile('^:([0-9]*):')
     return int(indexregex.match(placeholder.name).group(0).replace(':', ''))
@@ -74,6 +75,7 @@ def compileplaceholder(clip: bpy.types.Sequence, param):
                     removeclip(i)
 
 
+# get list of all clips inside metaclip that are to be replaced by parameters
 def get_placeholders(clip: bpy.types.MetaSequence):
     placeholders = []
     placeholderregex = re.compile('^:[0-9][0-9]*:')
@@ -87,6 +89,7 @@ def get_placeholders(clip: bpy.types.MetaSequence):
     return placeholders
 
 
+# convert normal #ffffff syntax to blender's color syntax
 def rgbtocolor(rgbcode):
     if not re.compile('^#[0-f][0-f][0-f][0-f][0-f][0-f]').match(rgbcode):
         return None
@@ -105,6 +108,8 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_idname = "proceditor.compile"
     bl_label = "compile text"
 
+
+
     def execute(self, context):
         selectedclips = saveselection()
 
@@ -115,7 +120,6 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
                 compilemarkupclip(i)
 
         # bpy.ops.sequencer.select(deselect_all=True)
-
         # for i in selectedclips:
         #     i.select = True
         return {'FINISHED'}
