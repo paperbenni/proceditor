@@ -108,6 +108,21 @@ def rgbtocolor(rgbcode):
     return retcolor
 
 
+def into_meta(clip, metaclip):
+    selection = saveselection()
+    bpy.ops.sequencer.copy()
+    bpy.ops.sequencer.select(deselect_all=True)
+    metaclip.select = True
+    currentframe = bpy.context.scene.frame_current
+    bpy.context.scene.sequence_editor.active_strip = metaclip
+    bpy.ops.sequencer.meta_toggle()
+    bpy.context.scene.frame_set(metaclip.frame_final_start)
+    bpy.ops.sequencer.paste()
+    bpy.ops.sequencer.meta_toggle()
+    bpy.context.scene.frame_set(currentframe)
+    restoreselection(selection)
+    # TODO deal with nested meta clips
+
 class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_idname = "proceditor.compile"
     bl_label = "compile text"
