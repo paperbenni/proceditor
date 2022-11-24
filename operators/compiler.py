@@ -48,8 +48,8 @@ def compiletemplate(clip: bpy.types.MetaSequence):
 
 # get parameter index for placeholder
 def getplaceholderindex(placeholder):
-    indexregex = re.compile('^:([0-9]*):')
-    return int(indexregex.match(placeholder.name).group(0).replace(':', ''))
+    indexregex = re.compile("^:([0-9]*):")
+    return int(indexregex.match(placeholder.name).group(0).replace(":", ""))
 
 
 def adjustlength(clip, oldlength):
@@ -67,22 +67,24 @@ def adjustlength(clip, oldlength):
 def compileplaceholder(clip: bpy.types.Sequence, param):
     cliptype = type(clip)
     # param as content for text clip
-    if cliptype == bpy.types.TextSequence:
+    if isinstance(clip, bpy.types.TextSequence):
         clip.text = param
     # multiple choice metaclips, delete all except with name choice.param
-    elif cliptype == bpy.types.MetaSequence:
+    elif isinstance(clip, bpy.types.MetaSequence):
         choices = clip.sequences.values()
-        for i in choices:
-            if i.name.startswith('choice.'):
-                if i.name.removeprefix('choice.') != param:
-                    removeclip(i)
+        if choices != None:
+            for i in choices:
+                if i.name.startswith("choice."):
+                    if i.name.removeprefix("choice.") != param:
+                        removeclip(i)
     # TODO: give index to choice
     # TODO: compile color clips with hex color code parameter
+
 
 # get list of all clips inside metaclip that are to be replaced by parameters
 def get_placeholders(clip: bpy.types.MetaSequence):
     placeholders = []
-    placeholderregex = re.compile('^:[0-9][0-9]*:')
+    placeholderregex = re.compile("^:[0-9][0-9]*:")
     counter = 0
 
     for i in clip.sequences.values():
@@ -95,42 +97,29 @@ def get_placeholders(clip: bpy.types.MetaSequence):
 
 # convert normal #ffffff syntax to blender's color syntax
 def rgbtocolor(rgbcode):
-    if not re.compile('^#[0-f][0-f][0-f][0-f][0-f][0-f]').match(rgbcode):
+    if not re.compile("^#[0-f][0-f][0-f][0-f][0-f][0-f]").match(rgbcode):
         return None
 
-    colorcode = rgbcode.removeprefix('#').lower()
-    colortuple = tuple(int(colorcode[i:i+2], 16) for i in (0, 2, 4))
-    retcolor = Color((
-        float(colortuple[0]) / 255,
-        float(colortuple[1]) / 255,
-        float(colortuple[2]) / 255
-    ))
+    colorcode = rgbcode.removeprefix("#").lower()
+    colortuple = tuple(int(colorcode[i : i + 2], 16) for i in (0, 2, 4))
+    retcolor = Color(
+        (
+            float(colortuple[0]) / 255,
+            float(colortuple[1]) / 255,
+            float(colortuple[2]) / 255,
+        )
+    )
     return retcolor
 
-
-# Next time, check if this is already in the blender api
-def into_meta2(clip, metaclip):
-    selection = saveselection()
-    bpy.ops.sequencer.copy()
-    bpy.ops.sequencer.select(deselect_all=True)
-    metaclip.select = True
-    currentframe = bpy.context.scene.frame_current
-    bpy.context.scene.sequence_editor.active_strip = metaclip
-    bpy.ops.sequencer.meta_toggle()
-    bpy.context.scene.frame_set(metaclip.frame_final_start)
-    bpy.ops.sequencer.paste()
-    bpy.ops.sequencer.meta_toggle()
-    bpy.context.scene.frame_set(currentframe)
-    restoreselection(selection)
 
 def into_meta(clip, metaclip):
     clip.frame_start = metaclip.frame_start
     clip.move_to_meta(metaclip)
 
+
 class PROCEDITOR_OT_compiler(bpy.types.Operator):
     bl_idname = "proceditor.compile"
     bl_label = "compile text"
-
 
     def execute(self, context):
         selectedclips = saveselection()
@@ -138,10 +127,10 @@ class PROCEDITOR_OT_compiler(bpy.types.Operator):
         rawsequences = getmarkupsequences()
 
         for i in rawsequences:
-            if i.text[0] == ';':
+            if i.text[0] == ";":
                 compilemarkupclip(i)
 
         # bpy.ops.sequencer.select(deselect_all=True)
         # for i in selectedclips:
         #     i.select = True
-        return {'FINISHED'}
+        return {"FINISHED"}

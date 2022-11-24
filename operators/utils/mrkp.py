@@ -1,6 +1,3 @@
-import re
-from enum import Enum
-
 from .strips import gettemplate
 
 # various markp utilities

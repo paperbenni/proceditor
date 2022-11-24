@@ -62,7 +62,7 @@ def getmarkupsequences(regex='', compiled=False):
     returnlist = []
     # compiled sequences have a _c at the end but may also have an auto assigned
     # number
-    tpattern = re.compile('.*(_c|_c\.[0-9]*)$')
+    tpattern = re.compile('.*(_c|_c\\.[0-9]*)$')
     if not regex == '':
         fpattern = re.compile(regex)
     for i in sequences:

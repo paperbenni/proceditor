@@ -16,13 +16,13 @@ def downloadclip(link):
     tmppath = os.environ['HOME'] + '/.cache/proceditor/music/' + hash
     if os.path.isdir(tmppath):
         for i in os.listdir(tmppath):
-            if re.compile('.*\.wav').match(i):
+            if re.compile('.*\\.wav').match(i):
                 return tmppath + '/' + i
     else:
         os.system('mkdir -p ' + tmppath)
         os.system('cd ' + tmppath + ' && youtube-dl -x --audio-format wav "' + link + '"')
         for i in os.listdir(tmppath):
-            if re.compile('.*\.wav').match(i):
+            if re.compile('.*\\.wav').match(i):
                 return tmppath + '/' + i
         return False
 
