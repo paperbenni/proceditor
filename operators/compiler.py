@@ -65,23 +65,30 @@ def adjustlength(clip, oldlength):
 
 
 def compileplaceholder(clip: bpy.types.Sequence, param):
-    cliptype = type(clip)
     # param as content for text clip
     if isinstance(clip, bpy.types.TextSequence):
         clip.text = param
     # multiple choice metaclips, delete all except with name choice.param
     elif isinstance(clip, bpy.types.MetaSequence):
         choices = clip.sequences.values()
-        if choices != None:
+        if choices != None and len(choices) != 0:
             for i in choices:
                 if i.name.startswith("choice."):
                     if i.name.removeprefix("choice.") != param:
                         removeclip(i)
+        else:
+            os.system("notify-send frank")
+            aboveclips = getnearbysequences(clip, 1)
+            if len(aboveclips) == 0:
+                return
+            aboveclip = aboveclips[0]
+            into_meta(aboveclip, clip)
     # TODO: give index to choice
     # TODO: compile color clips with hex color code parameter
 
 
 # get list of all clips inside metaclip that are to be replaced by parameters
+# TODO sort these by index
 def get_placeholders(clip: bpy.types.MetaSequence):
     placeholders = []
     placeholderregex = re.compile("^:[0-9][0-9]*:")

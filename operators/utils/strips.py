@@ -7,21 +7,33 @@ import bpy
 def getsequences():
     return list(bpy.context.scene.sequence_editor.sequences_all)
 
+
 def getnearbysequences(clip, range):
+    """
+    get clips above clip and within time boundaries of clip
+    """
     returnlist = []
     clipparent = clip.parent_meta()
     for i in getsequences():
-        if i.parent_meta() != clipparent:
+        if i.parent_meta() != clipparent.parent_meta():
             continue
-        if i.channel >= (clip.channel - range) and i.channel < clip.channel and i.frame_start >= clip.frame_start and i.frame_final_end <= clip.frame_final_end:
+        if (
+            i.channel >= (clip.channel - range)
+            and i.channel < clip.channel
+            and i.frame_start >= clip.frame_start
+            and i.frame_final_end <= clip.frame_final_end
+        ):
             returnlist.append(i)
             if len(returnlist) >= range:
                 break
+    returnlist.sort(key=lambda x: x.channel, reverse=True)
     return returnlist
+
 
 # TODO comment difference between this and getsequences
 def gettopsequences():
     return list(bpy.context.scene.sequence_editor.sequences)
+
 
 # some things don't have a good API so proceditor needs to emulate a user by
 # selecting and doing stuff with the clips
@@ -33,12 +45,12 @@ def saveselection():
             returnlist.append(i)
     return returnlist
 
+
 # restore clip selection after emulating a user due to lack of good API
 def restoreselection(selectlist):
     bpy.ops.sequencer.select(deselect_all=True)
     for i in selectlist:
         i.select = True
-
 
 
 def savesequences():
@@ -56,20 +68,24 @@ def getnewsequences(sequencelist):
             returnlist.append(bpy.context.scene.sequence_editor.sequences[i])
     return returnlist
 
+
 # get sequences witout the compiler marker _c$, optionally filter through regex
-def getmarkupsequences(regex='', compiled=False):
+def getmarkupsequences(regex="", compiled=False):
     sequences = bpy.context.scene.sequence_editor.sequences
     returnlist = []
     # compiled sequences have a _c at the end but may also have an auto assigned
     # number
-    tpattern = re.compile('.*(_c|_c\\.[0-9]*)$')
-    if not regex == '':
+    tpattern = re.compile(".*(_c|_c\\.[0-9]*)$")
+    if not regex == "":
         fpattern = re.compile(regex)
     for i in sequences:
-        if type(i) == bpy.types.TextSequence and \
-                (not compiled and not tpattern.match(i.name) or (compiled and tpattern.match(i.name))):
+        if type(i) == bpy.types.TextSequence and (
+            not compiled
+            and not tpattern.match(i.name)
+            or (compiled and tpattern.match(i.name))
+        ):
             # with custom search string
-            if not regex == '':
+            if not regex == "":
                 if not fpattern.match(i.text):
                     continue
             returnlist.append(i)
@@ -78,10 +94,10 @@ def getmarkupsequences(regex='', compiled=False):
 
 # get template clip with format template.name
 def gettemplate(tname):
-    templatename = 'template_' + tname
+    templatename = "template_" + tname
     for i in gettopsequences():
         if i.name.startswith(templatename):
-            os.system('echo ' + i.name + ' >> /tmp/test.txt')
+            os.system("echo " + i.name + " >> /tmp/test.txt")
             return i
 
     return False
@@ -112,7 +128,7 @@ def activateselection():
 def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
 
     sequences = bpy.context.scene.sequence_editor.sequences
-    if not templatename or templatename == '':
+    if not templatename or templatename == "":
         return False
 
     markupcontent = clip.text
@@ -129,19 +145,31 @@ def replacemarkupclip(clip: bpy.types.TextSequence, templatename: str):
     if not templateclip:
         return False
 
-    bpy.ops.sequencer.select_all(action='DESELECT')
+    bpy.ops.sequencer.select_all(action="DESELECT")
 
     sequences[templateclip.name].select = True
 
     # maybe replace ops with api
-    bpy.ops.sequencer.duplicate_move(SEQUENCER_OT_duplicate={},
-                                     TRANSFORM_OT_seq_slide={"value": (startframe - templateclip.frame_final_start,
-                                                                       markupchannel - templateclip.channel), "release_confirm": False, "use_accurate": False})
+    bpy.ops.sequencer.duplicate_move(
+        SEQUENCER_OT_duplicate={},
+        TRANSFORM_OT_seq_slide={
+            "value": (
+                startframe - templateclip.frame_final_start,
+                markupchannel - templateclip.channel,
+            ),
+            "release_confirm": False,
+            "use_accurate": False,
+        },
+    )
 
-    newclip = list(filter(lambda element: element.select, list(
-        bpy.context.scene.sequence_editor.sequences)))[0]
+    newclip = list(
+        filter(
+            lambda element: element.select,
+            list(bpy.context.scene.sequence_editor.sequences),
+        )
+    )[0]
     newclip.frame_final_duration = markupduration
-    newclip.name = clipname + '_c'
+    newclip.name = clipname + "_c"
     newclip["pcontent"] = markupcontent
     newclip["templatelength"] = templatelength
 
@@ -163,6 +191,7 @@ def removeclip(clip):
     clip.select = True
     bpy.ops.sequencer.delete()
 
+
 # move keyframes at the end of the clip towards the end
 
 
@@ -177,7 +206,7 @@ def adjustkeyframes(clip, oldduration):
 
     for i in frames:
         frametime = i.co[0]
-        if (frametime > (clip.frame_final_start + oldduration / 2)):
+        if frametime > (clip.frame_final_start + oldduration / 2):
             endframes.append(i)
         else:
             beginframes.append(i)
